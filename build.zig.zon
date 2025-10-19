@@ -1,0 +1,17 @@
+.{
+    .name = .rgfw,
+    .version = "0.0.0",
+    .fingerprint = 0x502c4210aa0e037a,
+    .minimum_zig_version = "0.15.2",
+    .dependencies = .{
+        .rgfw = .{
+            .url = "git+https://github.com/ColleagueRiley/RGFW",
+            .hash = "N-V-__8AAPGAPQDebzneVxBJyy61t5JaM4nEsfQVCZ1YthXv",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
