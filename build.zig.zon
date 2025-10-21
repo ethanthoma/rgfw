@@ -5,8 +5,8 @@
     .minimum_zig_version = "0.15.2",
     .dependencies = .{
         .rgfw = .{
-            .url = "git+https://github.com/ethanthoma/rgfw#b6a80997d7edad5bfad6b5e4256959f66804413a",
-            .hash = "N-V-__8AAMHYPQDNk8IQ8bt7lGLsqxH8Mz3bwRneBkMXp5Ih",
+            .url = "git+https://github.com/ethanthoma/rgfw#96020d3e45d9c9e4ed05d0b03392651889027b7a",
+            .hash = "N-V-__8AALzYPQBfluieUlz-3ySvAamqWGSK6phpHA7Oxs3e",
         },
         .wgpu_native_zig = .{
             .url = "https://github.com/carrot-sticks/wgpu_native_zig/archive/zig-v0.15.1.tar.gz",
