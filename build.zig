@@ -3,6 +3,8 @@ const std = @import("std");
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
+    const enable_webgpu = b.option(bool, "webgpu", "Enable WebGPU support (requires wgpu_native)") orelse false;
+    const enable_wayland = b.option(bool, "wayland", "Enable Wayland support") orelse true;
 
     const rgfw_dep = b.dependency("rgfw", .{});
 
@@ -68,6 +70,13 @@ pub fn build(b: *std.Build) void {
 
     lib.linkLibC();
     lib.addIncludePath(rgfw_dep.path(""));
+
+    if (enable_webgpu) {
+        const wgpu_native = b.lazyDependency("wgpu_linux_x86_64_debug", .{}) orelse @panic("wgpu_linux_x86_64_debug dependency not found");
+        lib.addIncludePath(wgpu_native.path("include"));
+        lib.addLibraryPath(wgpu_native.path("lib"));
+    }
+
     lib.addIncludePath(xdg_shell_h.dirname());
     lib.addIncludePath(toplevel_icon_h.dirname());
     lib.addIncludePath(xdg_decoration_h.dirname());
@@ -75,22 +84,29 @@ pub fn build(b: *std.Build) void {
     lib.addIncludePath(pointer_constraints_h.dirname());
     lib.addIncludePath(xdg_output_h.dirname());
 
-    lib.addCSourceFile(.{
-        .file = b.addWriteFiles().add("rgfw.c",
-            \\#define RGFW_WAYLAND
-            \\#define RGFW_X11
-            \\#define RGFW_IMPLEMENTATION
-            \\#include <RGFW.h>
-        ),
+    const rgfw_c_source = b.fmt(
+        \\#define RGFW_UNIX
+        \\#define RGFW_X11
+        \\{s}{s}#define RGFW_IMPLEMENTATION
+        \\#include <RGFW.h>
+        \\
+    , .{
+        if (enable_wayland) "#define RGFW_WAYLAND\n" else "",
+        if (enable_webgpu) "#define RGFW_WEBGPU\n" else "",
     });
 
-    lib.addCSourceFile(.{ .file = xdg_shell_c });
-    lib.addCSourceFile(.{ .file = toplevel_icon_c });
-    lib.addCSourceFile(.{ .file = xdg_decoration_c });
-    lib.addCSourceFile(.{ .file = relative_pointer_c });
-    lib.addCSourceFile(.{ .file = pointer_constraints_c });
-    lib.addCSourceFile(.{ .file = xdg_output_c });
+    lib.addCSourceFile(.{
+        .file = b.addWriteFiles().add("rgfw.c", rgfw_c_source),
+    });
 
+    if (enable_wayland) {
+        lib.addCSourceFile(.{ .file = xdg_shell_c });
+        lib.addCSourceFile(.{ .file = toplevel_icon_c });
+        lib.addCSourceFile(.{ .file = xdg_decoration_c });
+        lib.addCSourceFile(.{ .file = relative_pointer_c });
+        lib.addCSourceFile(.{ .file = pointer_constraints_c });
+        lib.addCSourceFile(.{ .file = xdg_output_c });
+    }
 
     if (b.graph.env_map.get("LD_LIBRARY_PATH")) |lib_path| {
         var it = std.mem.tokenizeScalar(u8, lib_path, ':');
@@ -118,11 +134,21 @@ pub fn build(b: *std.Build) void {
     mod.linkSystemLibrary("Xinerama", .{});
     mod.linkSystemLibrary("Xrandr", .{});
     mod.linkSystemLibrary("Xcursor", .{});
-    mod.linkSystemLibrary("wayland-client", .{});
-    mod.linkSystemLibrary("wayland-cursor", .{});
-    mod.linkSystemLibrary("wayland-egl", .{});
-    mod.linkSystemLibrary("decor-0", .{});
-    mod.linkSystemLibrary("xkbcommon", .{});
+    mod.linkSystemLibrary("GL", .{});
+
+    if (enable_wayland) {
+        mod.linkSystemLibrary("wayland-client", .{});
+        mod.linkSystemLibrary("wayland-cursor", .{});
+        mod.linkSystemLibrary("wayland-egl", .{});
+        mod.linkSystemLibrary("decor-0", .{});
+        mod.linkSystemLibrary("xkbcommon", .{});
+    }
+
+    if (enable_webgpu) {
+        const wgpu_native = b.lazyDependency("wgpu_linux_x86_64_debug", .{}) orelse @panic("wgpu_linux_x86_64_debug dependency not found");
+        mod.addLibraryPath(wgpu_native.path("lib"));
+        mod.linkSystemLibrary("wgpu_native", .{});
+    }
 
     if (b.graph.env_map.get("LD_LIBRARY_PATH")) |lib_path| {
         var it = std.mem.tokenizeScalar(u8, lib_path, ':');

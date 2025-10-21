@@ -9,6 +9,10 @@ const Window = @This();
 
 const RGFW_Window = extern struct {};
 
+pub const wl_display = extern struct {};
+pub const wl_surface = extern struct {};
+pub const x11_display = extern struct {};
+
 window: *RGFW_Window,
 should_close: bool,
 
@@ -71,7 +75,6 @@ pub fn deinit(self: *Window) void {
 }
 
 extern fn RGFW_window_shouldClose(win: *RGFW_Window) bool;
-
 extern fn RGFW_window_checkEvent(win: *RGFW_Window, event: *CEvent) bool;
 pub fn getEvent(self: *Window) ?Event {
     self.should_close = RGFW_window_shouldClose(self.window);
@@ -85,3 +88,40 @@ pub fn getEvent(self: *Window) ?Event {
     }
     return null;
 }
+
+extern fn RGFW_getDisplay_Wayland() ?*wl_display;
+pub fn getWaylandDisplay() ?*wl_display {
+    return RGFW_getDisplay_Wayland();
+}
+
+extern fn RGFW_window_getWindow_Wayland(win: *RGFW_Window) ?*wl_surface;
+pub fn getWaylandSurface(self: *Window) ?*wl_surface {
+    return RGFW_window_getWindow_Wayland(self.window);
+}
+
+extern fn RGFW_getDisplay_X11() ?*x11_display;
+pub fn getX11Display() ?*x11_display {
+    return RGFW_getDisplay_X11();
+}
+
+extern fn RGFW_window_getWindow_X11(win: *RGFW_Window) u64;
+pub fn getX11Window(self: *Window) u64 {
+    return RGFW_window_getWindow_X11(self.window);
+}
+
+// WebGPU surface creation (requires RGFW_WEBGPU)
+extern fn RGFW_window_createSurface_WebGPU(win: *RGFW_Window, instance: ?*anyopaque) ?*anyopaque;
+pub fn createSurfaceWebGPU(self: *Window, wgpu_instance: ?*anyopaque) ?*anyopaque {
+    return RGFW_window_createSurface_WebGPU(self.window, wgpu_instance);
+}
+
+const RGFW_Window_Src = extern struct {
+    x: i32,
+    y: i32,
+    w: i32,
+    h: i32,
+    // NO ctx/gfx_type fields when RGFW_NO_API is used
+    // X11 fields
+    x11_window: c_ulong, // Window (XID)
+    gc: ?*anyopaque, // GC
+};
