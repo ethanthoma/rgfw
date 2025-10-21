@@ -5,8 +5,17 @@
     .minimum_zig_version = "0.15.2",
     .dependencies = .{
         .rgfw = .{
-            .url = "git+https://github.com/ColleagueRiley/RGFW",
-            .hash = "N-V-__8AAPGAPQDebzneVxBJyy61t5JaM4nEsfQVCZ1YthXv",
+            .url = "git+https://github.com/ethanthoma/rgfw#b6a80997d7edad5bfad6b5e4256959f66804413a",
+            .hash = "N-V-__8AAMHYPQDNk8IQ8bt7lGLsqxH8Mz3bwRneBkMXp5Ih",
+        },
+        .wgpu_native_zig = .{
+            .url = "https://github.com/carrot-sticks/wgpu_native_zig/archive/zig-v0.15.1.tar.gz",
+            .hash = "wgpu_native_zig-6.5.0-B9jeDGhzAwDKk_uGG5fG5vO7uzmzwj-EQ-DLrmR2wpdK",
+        },
+        .wgpu_linux_x86_64_debug = .{
+            .url = "https://github.com/gfx-rs/wgpu-native/releases/download/v25.0.2.1/wgpu-linux-x86_64-debug.zip",
+            .hash = "N-V-__8AAHS_-BNtAmT4hK9geZG361RETmD2lG0fk2gyDYh-",
+            .lazy = true,
         },
     },
     .paths = .{
