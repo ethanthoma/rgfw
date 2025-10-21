@@ -87,12 +87,13 @@ pub fn build(b: *std.Build) void {
     const rgfw_c_source = b.fmt(
         \\#define RGFW_UNIX
         \\#define RGFW_X11
-        \\{s}{s}#define RGFW_IMPLEMENTATION
+        \\{s}{s}{s}#define RGFW_IMPLEMENTATION
         \\#include <RGFW.h>
         \\
     , .{
         if (enable_wayland) "#define RGFW_WAYLAND\n" else "",
         if (enable_webgpu) "#define RGFW_WEBGPU\n" else "",
+        if (enable_webgpu) "#define RGFW_NO_API\n" else "",
     });
 
     lib.addCSourceFile(.{
