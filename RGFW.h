@@ -7276,7 +7276,7 @@ static void RGFW_wl_setOpaque(RGFW_window* win) {
 
 }
 
-static void RGFW_wl_xdg_wm_base_ping_handler(void* data, struct xdg_wm_base* wm_base,
+void RGFW_wl_xdg_wm_base_ping_handler(void* data, struct xdg_wm_base* wm_base,
 		u32 serial) {
 	RGFW_UNUSED(data);
     xdg_wm_base_pong(wm_base, serial);
@@ -7811,7 +7811,7 @@ static void RGFW_wl_surface_enter(void *data, struct wl_surface *wl_surface, str
 	#endif
 }
 
-static void RGFW_wl_global_registry_handler(void* data, struct wl_registry *registry, u32 id, const char *interface, u32 version) {
+void RGFW_wl_global_registry_handler(void* data, struct wl_registry *registry, u32 id, const char *interface, u32 version) {
 
     static struct wl_seat_listener seat_listener = {&RGFW_wl_seat_capabilities, (void (*)(void *, struct wl_seat *, const char *))&RGFW_doNothing};
     static const struct wl_shm_listener shm_listener = { .format = RGFW_wl_shm_format_handler };
@@ -7843,7 +7843,7 @@ static void RGFW_wl_global_registry_handler(void* data, struct wl_registry *regi
 	}
 }
 
-static void RGFW_wl_global_registry_remove(void* data, struct wl_registry *registry, u32 id) {
+void RGFW_wl_global_registry_remove(void* data, struct wl_registry *registry, u32 id) {
 	RGFW_UNUSED(data); RGFW_UNUSED(registry);
 	RGFW_info* RGFW = (RGFW_info*)data;
 	RGFW_monitorNode* prev = RGFW->monitors.list.head;
